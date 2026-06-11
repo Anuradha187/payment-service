@@ -49,3 +49,6 @@ jobs:
 
       - name: Run tests
         run: mvn test
+      env:
+  DB_USERNAME: root
+  DB_PASSWORD: Bhagat
