@@ -1,64 +1,63 @@
 name: Payment CI/CD Pipeline
 
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+push:
+branches:
+- main
+pull_request:
+branches:
+- main
 
 jobs:
-  build-and-test:
-    runs-on: ubuntu-latest
+build-and-test:
+runs-on: ubuntu-latest
 
-    services:
-      mysql:
-        image: mysql:8.0
-
-        env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: paymentdb
-          MYSQL_USER: paymentuser
-          MYSQL_PASSWORD: paymentpass
-
-        ports:
-          - 3306:3306
-
-        options: >-
-          --health-cmd="mysqladmin ping -h localhost -uroot -proot"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=10
+```
+services:
+  mysql:
+    image: mysql:8.0
 
     env:
-      SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/paymentdb?createDatabaseIfNotExist=true
-      SPRING_DATASOURCE_USERNAME: paymentuser
-      SPRING_DATASOURCE_PASSWORD: paymentpass
+      MYSQL_ROOT_PASSWORD: Bhagat
+      MYSQL_DATABASE: paymentdev
 
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+    ports:
+      - 3306:3306
 
-      - name: Setup JDK 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: 17
-          cache: maven
+    options: >-
+      --health-cmd="mysqladmin ping -h localhost -uroot -pBhagat"
+      --health-interval=10s
+      --health-timeout=5s
+      --health-retries=10
 
-      - name: Wait for MySQL
-        run: |
-          until mysqladmin ping -h "127.0.0.1" -u paymentuser -ppaymentpass --silent; do
-            echo "Waiting for MySQL..."
-            sleep 5
-          done
+env:
+  SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/paymentdev
+  SPRING_DATASOURCE_USERNAME: root
+  SPRING_DATASOURCE_PASSWORD: Bhagat
 
-      - name: Build and Run Tests
-        run: mvn clean verify
+steps:
+  - name: Checkout Repository
+    uses: actions/checkout@v4
 
-      - name: Upload JAR Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: payment-processing-system
-          path: target/*.jar
+  - name: Setup JDK 17
+    uses: actions/setup-java@v4
+    with:
+      distribution: temurin
+      java-version: 17
+      cache: maven
+
+  - name: Wait for MySQL
+    run: |
+      until mysqladmin ping -h "127.0.0.1" -u root -pBhagat --silent; do
+        echo "Waiting for MySQL..."
+        sleep 5
+      done
+
+  - name: Build and Run Tests
+    run: mvn clean verify
+
+  - name: Upload JAR Artifact
+    uses: actions/upload-artifact@v4
+    with:
+      name: payment-processing-system
+      path: target/*.jar
